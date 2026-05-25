@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo - Controle de Ponto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Transições suaves para computador e celular */
+    .sidebar-transition {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .rotate-transition {
+      transition: transform 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col md:flex-row overflow-x-hidden">
+
+  <div class="md:hidden bg-white border-b border-gray-100 p-4 flex justify-between items-center z-30 sticky top-0 w-full">
+    <div class="space-y-0.5">
+      <h1 class="text-base font-bold text-gray-900 tracking-tight">Painel Admin</h1>
+      <p class="text-[9px] text-gray-400 font-medium uppercase tracking-wider">Gestão de Equipe</p>
+    </div>
+    <button id="btnMobileToggle" class="p-2 hover:bg-gray-50 rounded-xl text-gray-500">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </div>
+
+  <div id="sidebarOverlay" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-30 hidden md:hidden transition-opacity duration-300 opacity-0"></div>
+
+  <aside id="sidebarAdmin" class="fixed inset-y-0 left-0 z-40 w-64 bg-white p-4 flex flex-col justify-between flex-shrink-0 sidebar-transition transform -translate-x-full md:translate-x-0 md:sticky md:top-0 md:h-screen md:w-20 md:border-r border-gray-100">
+    <div class="space-y-6">
+      <div class="hidden md:flex items-center justify-center pb-2 border-b border-gray-50">
+        <button id="btnToggleSidebar" class="p-2 hover:bg-gray-50 rounded-xl text-gray-500 hover:text-blue-600 transition-all focus:outline-none">
+          <svg id="iconeHamburguer" class="w-6 h-6 rotate-transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex md:hidden items-center justify-between pb-4 border-b border-gray-50">
+        <div class="space-y-0.5">
+          <h1 class="text-lg font-bold text-gray-900">Painel Admin</h1>
+          <p class="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Gestão de Equipe</p>
+        </div>
+        <button id="btnMobileClose" class="p-2 text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      
+      <nav class="space-y-1" id="menuLateral">
+        <button data-aba="visao-geral" class="w-full flex items-center px-3 py-3 text-sm font-semibold text-blue-600 bg-blue-50 rounded-xl transition-all text-left bind-aba group" title="Visão Geral">
+          <svg class="w-5 h-5 flex-shrink-0 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span class="ml-3 md:hidden sidebar-texto whitespace-nowrap transition-all duration-200">Visão Geral</span>
+        </button>
+
+        <button data-aba="funcionarios" class="w-full flex items-center px-3 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-xl transition-all text-left bind-aba group" title="Funcionários">
+          <svg class="w-5 h-5 flex-shrink-0 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span class="ml-3 md:hidden sidebar-texto whitespace-nowrap transition-all duration-200">Funcionários</span>
+        </button>
+
+        <button data-aba="atestados" class="w-full flex items-center px-3 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-xl transition-all text-left bind-aba group" title="Atestados e Faltas">
+          <svg class="w-5 h-5 flex-shrink-0 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span class="ml-3 md:hidden sidebar-texto whitespace-nowrap transition-all duration-200">Atestados e Faltas</span>
+        </button>
+      </nav>
+    </div>
+
+    <button onclick="AuthController.efetuarLogout()" class="flex items-center px-3 py-3 mt-4 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all w-full text-left group" title="Sair do Sistema">
+      <svg class="w-5 h-5 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+      </svg>
+      <span class="ml-3 md:hidden sidebar-texto whitespace-nowrap transition-all duration-200">Sair do Sistema</span>
+    </button>
+  </aside>
+
+  <main class="flex-1 p-4 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
+    
+    <div id="conteudo-visao-geral" class="space-y-6 abas-painel">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-100 pb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Relatório Mensal de Faltas</h2>
+          <p class="text-sm text-gray-500">Monitore assiduidade e exporte as informações consolidadas</p>
+        </div>
+        <button onclick="AdminController.exportarFaltasPdf()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-5 py-3 rounded-xl shadow-sm transition-all whitespace-nowrap">
+          Emitir PDF do Mês
+        </button>
+      </div>
+
+      <div class="bg-white border border-gray-100 rounded-2xl p-4 md:p-6 shadow-sm space-y-4">
+        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Histórico Recente de Ocorrências</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="border-b border-gray-100 text-gray-400 font-medium">
+                <th class="py-3 px-2">Funcionário</th>
+                <th class="py-3 px-2">Data</th>
+                <th class="py-3 px-2">Status</th>
+                <th class="py-3 px-2 text-right">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaFaltas" class="divide-y divide-gray-50">
+              <tr class="text-gray-500">
+                <td colspan="4" class="py-4 text-center text-gray-400 text-xs">Buscando dados no sistema...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="conteudo-funcionarios" class="space-y-6 abas-painel hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-100 pb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Gerenciar Colaboradores</h2>
+          <p class="text-sm text-gray-500">Visualize a listagem interna ou adicione novos membros na equipe</p>
+        </div>
+        <button onclick="AdminView.abrirModalFuncionario()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-5 py-3 rounded-xl shadow-sm transition-all whitespace-nowrap flex items-center justify-center">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Novo Funcionário
+        </button>
+      </div>
+
+      <div class="bg-white border border-gray-100 rounded-2xl p-4 md:p-6 shadow-sm space-y-4">
+        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider">Colaboradores Cadastrados</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="border-b border-gray-100 text-gray-400 font-medium">
+                <th class="py-3 px-4">Nome Completo</th>
+                <th class="py-3 px-4">CPF</th>
+                <th class="py-3 px-4">Cargo / Função</th>
+                <th class="py-3 px-4">Nível de Acesso</th>
+                <th class="py-3 px-4 text-center">Faltas (Mês)</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaFuncionarios" class="divide-y divide-gray-50">
+              <tr>
+                <td colspan="5" class="py-6 text-center text-gray-400 text-xs">Carregando lista de funcionários...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="conteudo-atestados" class="space-y-6 abas-painel hidden">
+      <div class="border-b border-gray-100 pb-4">
+        <h2 class="text-2xl font-bold text-gray-900">Lançamento de Justificativas</h2>
+        <p class="text-sm text-gray-500">Insira dispensas médicas e licenças por múltiplos dias de forma automatizada</p>
+      </div>
+
+      <div class="max-w-2xl bg-white border border-gray-100 rounded-2xl p-4 md:p-6 shadow-sm space-y-4">
+        <div class="border-b border-gray-50 pb-2">
+          <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">Formulário de Justificativa médica</h3>
+        </div>
+        <form id="formAtestado" class="space-y-4">
+          <div class="space-y-1">
+            <label class="text-xs font-bold text-gray-500 uppercase">CPF do Funcionário</label>
+            <input type="text" placeholder="000.000.000-00" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-mono focus:outline-none focus:border-blue-500">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-gray-500 uppercase">Início</label>
+              <input type="date" required class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none">
+            </div>
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-gray-500 uppercase">Fim</label>
+              <input type="date" required class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none">
+            </div>
+          </div>
+          <div class="space-y-1">
+            <label class="text-xs font-bold text-gray-500 uppercase">Documento Comprovante (PDF ou Imagem)</label>
+            <input type="file" accept="image/*,application/pdf" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+          </div>
+          <button type="submit" class="w-full py-3 bg-gray-900 hover:bg-gray-800 text-white font-medium text-sm rounded-xl transition-all">
+            Salvar Justificativa
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <div id="modalFuncionario" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-all duration-300">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 transform scale-95 transition-all duration-300 mx-4">
+      <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
+        <h3 class="text-lg font-bold text-gray-900">Cadastrar Novo Colaborador</h3>
+        <button onclick="AdminView.fecharModalFuncionario()" class="text-gray-400 hover:text-gray-600 transition-all">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="formGerenciarFuncionario" class="space-y-4">
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500 uppercase">Nome Completo</label>
+          <input type="text" id="cadNome" placeholder="Ex: Moab Lima Silva" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+        </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500 uppercase">CPF</label>
+          <input type="text" id="cadCpf" maxlength="14" placeholder="000.000.000-00" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-mono focus:outline-none focus:border-blue-500">
+        </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500 uppercase">Cargo / Função</label>
+          <input type="text" id="cadCargo" placeholder="Ex: Secretária" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+        </div>
+        <div class="flex items-center space-x-2 pt-2">
+          <input type="checkbox" id="cadAdmin" class="w-4 h-4 text-blue-600 bg-gray-50 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+          <label for="cadAdmin" class="text-xs font-semibold text-gray-700 cursor-pointer select-none">Dar privilégios de Administrador a este perfil</label>
+        </div>
+        <div class="flex gap-3 pt-4 border-t border-gray-50">
+          <button type="button" onclick="AdminView.fecharModalFuncionario()" class="w-1/2 py-2.5 border border-gray-200 text-gray-600 font-semibold text-sm rounded-xl hover:bg-gray-50 transition-all">Cancelar</button>
+          <button type="submit" class="w-1/2 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl transition-all shadow-sm">Salvar Dados</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore-compat.js"></script>
+
+  <script src="src/config/firebase-config.js"></script>
+  <script src="src/models/PontoModel.js"></script>
+  <script src="src/controllers/AuthController.js"></script>
+  <script src="src/controllers/AdminController.js"></script>
+  <script src="src/views/dashboardView.js"></script>
+
+  <script>
+    const sidebar = document.getElementById('sidebarAdmin');
+    const overlay = document.getElementById('sidebarOverlay');
+    const textos = document.querySelectorAll('.sidebar-texto');
+    const icone = document.getElementById('iconeHamburguer');
+
+    // CONTRÔLE 1: FUNÇÕES PARA O CELULAR (ABRIR E FECHAR GAVETA)
+    function abrirGavetaCelular() {
+      overlay.classList.remove('hidden');
+      setTimeout(() => overlay.classList.add('opacity-100'), 10);
+      sidebar.classList.remove('-translate-x-full');
+      textos.forEach(t => t.classList.remove('md:hidden')); // Mostra os textos no celular
+    }
+
+    function fecharGavetaCelular() {
+      overlay.classList.remove('opacity-100');
+      sidebar.classList.add('-translate-x-full');
+      setTimeout(() => overlay.classList.add('hidden'), 300);
+    }
+
+    document.getElementById('btnMobileToggle').addEventListener('click', abrirGavetaCelular);
+    document.getElementById('btnMobileClose').addEventListener('click', fecharGavetaCelular);
+    overlay.addEventListener('click', fecharGavetaCelular);
+
+    // Fecha a gaveta automaticamente no celular ao clicar em uma aba do menu
+    document.querySelectorAll('.bind-aba').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (window.innerWidth < 768) fecharGavetaCelular();
+      });
+    });
+
+    // CONTRÔLE 2: FUNÇÃO PARA O COMPUTADOR (REDUZIR E EXPANDIR)
+    document.getElementById('btnToggleSidebar').addEventListener('click', () => {
+      const estáRecuada = sidebar.classList.contains('md:w-20');
+      
+      if (estáRecuada) {
+        sidebar.classList.remove('md:w-20');
+        sidebar.classList.add('md:w-64');
+        icone.style.transform = 'rotate(90deg)';
+        setTimeout(() => textos.forEach(t => t.classList.remove('md:hidden')), 100);
+      } else {
+        sidebar.classList.remove('md:w-64');
+        sidebar.classList.add('md:w-20');
+        icone.style.transform = 'rotate(0deg)';
+        textos.forEach(t => t.classList.add('md:hidden'));
+      }
+    });
+  </script>
+</body>
+</html>
